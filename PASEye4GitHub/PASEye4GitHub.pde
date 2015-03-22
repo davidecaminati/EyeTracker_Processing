@@ -60,7 +60,7 @@ void setup() {
   cam = new Capture(this, camWidth, camHeight, 30);
   cam.start();
   
-    String portName = Serial.list()[1];
+    String portName = Serial.list()[0];
   //print(portName);
   myPort = new Serial(this, portName, 9600);
   
@@ -116,7 +116,7 @@ void draw() {
    // manda "6/n" alla seriale 36
    if(millis() - time >= wait){
         fill(204);                    // change color and
-        myPort.write('d');              // send an H to indicate mouse is over square
+        myPort.write("DESTRA-");              // send an H to indicate mouse is over square
         tick = !tick;//if it is, do something
         time = millis();//also update the stored time
       }
@@ -129,7 +129,6 @@ void draw() {
    // manda "6/n" alla seriale 36
    if(millis() - time >= wait){
         fill(204);                    // change color and
-        myPort.write('s');              // send an H to indicate mouse is over square
         tick = !tick;//if it is, do something
         time = millis();//also update the stored time
       }
@@ -153,12 +152,16 @@ void draw() {
   if(monitorSwitch==5){
     if (posizione == 0){
       println("Posizione : SINISTRA");
+      myPort.write('s');              // send an H to indicate mouse is over square
+
     }    
     if (posizione == 1){
       println("Posizione : CENTRO");
+      myPort.write('c');              // send an H to indicate mouse is over square
     }    
     if (posizione == 2){
       println("Posizione : DESTRA");
+      myPort.write('d');              // send an H to indicate mouse is over square
     }
   }
    
