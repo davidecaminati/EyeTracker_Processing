@@ -1,5 +1,6 @@
 /*
 Rendere l'algoritmo di pupil detection + rock solid!!!
+Created by Daniele D'Arrigo e Davide Caminati
 */
 import processing.video.*;
 
@@ -27,7 +28,7 @@ int cursorX,cursorY;
 int darkestX,darkestY;
 //var di monitoraggio
 boolean visualize=false;
-int monitorSwitch=0;
+int monitorSwitch=5;
 int camWidth = 640;
 int camHeight = 480;
 //int lensWidth = 640;
@@ -48,11 +49,11 @@ Serial myPort;  // Create object from Serial class
 int val;        // Data received from the serial port
 
 int time;
-int wait = 1500;
+int wait = 3000;
 
 boolean tick;
 
-
+int ultimaposizione = 3;
 
 void setup() {
   size(camWidth, camHeight);
@@ -61,8 +62,8 @@ void setup() {
   cam.start();
   
     String portName = Serial.list()[0];
-  //print(portName);
-  myPort = new Serial(this, portName, 9600);
+  print(portName);
+  myPort = new Serial(this, "/dev/ttyUSB0", 9600);
   
   time = millis();//store the current time
 }
@@ -109,33 +110,52 @@ void draw() {
   northY=darkestY;
   
   //centro
-  posizione = 1;
+  //posizione = 1;
   
   //destra
   if (eastX > gest_Destra){
-   // manda "6/n" alla seriale 36
-   if(millis() - time >= wait){
-        fill(204);                    // change color and
-        myPort.write("DESTRA-");              // send an H to indicate mouse is over square
-        tick = !tick;//if it is, do something
-        time = millis();//also update the stored time
-      }
-      
-        posizione = 2;
+    if (posizione != 2){
+     // manda "6/n" alla seriale 36
+     if(millis() - time >= wait){
+          fill(204);                    // change color and
+          myPort.write('2');              // send an H to indicate mouse is over square
+          myPort.write('\n');              // send an H to indicate mouse is over square
+          tick = !tick;//if it is, do something
+          time = millis();//also update the stored time
+          posizione = 2;
+        }
+    }
   }
   
   //sinistra
   if (eastX < gest_Sinistra){
-   // manda "6/n" alla seriale 36
-   if(millis() - time >= wait){
-        fill(204);                    // change color and
-        tick = !tick;//if it is, do something
-        time = millis();//also update the stored time
-      }
-      
-        posizione = 0;
+    if (posizione != 0){
+     // manda "6/n" alla seriale 36
+     if(millis() - time >= wait){
+          fill(204);                    // change color and
+          myPort.write('0');              // send an H to indicate mouse is over square
+          myPort.write('\n');              // send an H to indicate mouse is over square
+          tick = !tick;//if it is, do something
+          time = millis();//also update the stored time
+          posizione = 0;
+        }
+    }
   }
   
+  //centro
+  if ((eastX < gest_Destra) & (eastX > gest_Sinistra)) {
+    if (posizione != 1){
+     // manda "6/n" alla seriale 36
+     if(millis() - time >= wait){
+          fill(204);                    // change color and
+          myPort.write('1');              // send an H to indicate mouse is over square
+          myPort.write('\n');              // send an H to indicate mouse is over square
+          tick = !tick;//if it is, do something
+          time = millis();//also update the stored time
+          posizione = 1;
+        }
+    }
+  }
   
   //Initialize ovest e sud point
   //ovestX=oldX;
@@ -150,18 +170,18 @@ void draw() {
     println("sudX:  "+sudX);
   }
   if(monitorSwitch==5){
-    if (posizione == 0){
-      println("Posizione : SINISTRA");
-      myPort.write('s');              // send an H to indicate mouse is over square
-
-    }    
-    if (posizione == 1){
-      println("Posizione : CENTRO");
-      myPort.write('c');              // send an H to indicate mouse is over square
-    }    
-    if (posizione == 2){
-      println("Posizione : DESTRA");
-      myPort.write('d');              // send an H to indicate mouse is over square
+    if (posizione != ultimaposizione){
+    
+      if (posizione == 0){
+        println("Posizione : SINISTRA");
+      }    
+      if (posizione == 1){
+        println("Posizione : CENTRO");
+      }    
+      if (posizione == 2){
+        println("Posizione : DESTRA");
+      }
+      ultimaposizione = posizione;
     }
   }
    
